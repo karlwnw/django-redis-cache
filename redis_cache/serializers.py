@@ -4,6 +4,11 @@ except ImportError:
     import pickle
 
 import json
+import sys
+
+force_encoding = None
+if sys.version_info >= (3, 0):
+    force_encoding = "latin1"
 
 try:
     import msgpack
@@ -39,7 +44,10 @@ class PickleSerializer(object):
         return pickle.dumps(value, self.pickle_version)
 
     def deserialize(self, value):
-        return pickle.loads(force_bytes(value))
+        if force_encoding:
+            return pickle.loads(force_bytes(value), encoding=force_encoding)
+        else:
+            return pickle.loads(force_bytes(value))
 
 
 class JSONSerializer(BaseSerializer):
